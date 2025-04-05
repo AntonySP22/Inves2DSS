@@ -20,7 +20,7 @@
 
 1. **Clonar el Repositorio**
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
+   git clone https://github.com/AntonySP22/Inves2DSS
    ```
 
 2. **Mover el Proyecto**
