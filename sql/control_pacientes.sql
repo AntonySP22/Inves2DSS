@@ -108,22 +108,3 @@ CREATE TABLE IF NOT EXISTS logs_acceso (
     ip_address VARCHAR(45),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
-
-
----- Datos para enfermedades y medicamentos
-INSERT INTO medicamentos (tratamiento_id, nombre_medicamento, dosis, frecuencia, via_administracion) VALUES
-(1, 'Metformina', '850 mg', 'Cada 8 horas', 'Oral'),
-(1, 'Insulina Glargina', '20 unidades', 'Una vez al día', 'Subcutánea'),
-(1, 'Losartán', '50 mg', 'Cada 24 horas', 'Oral'),
-(2, 'Salbutamol', '100 mcg', 'Cada 6 horas (si es necesario)', 'Inhalación'),
-(2, 'Budesónida', '200 mcg', 'Dos veces al día', 'Inhalación'),
-(3, 'Ibuprofeno', '400 mg', 'Cada 8 horas (con comida)', 'Oral');
-
-
-INSERT INTO enfermedades (nombre, descripcion) VALUES
-('Diabetes Tipo 1', 'Deficiencia de insulina por destrucción de células beta del páncreas.'),
-('Diabetes Tipo 2', 'Resistencia a la insulina con producción deficiente.'),
-('Hipertensión Arterial', 'Presión arterial sistólica ≥140 mmHg o diastólica ≥90 mmHg.'),
-('Asma', 'Inflamación crónica de las vías respiratorias.'),
-('Artritis Reumatoide', 'Enfermedad autoinmune que afecta articulaciones.'),
-('EPOC', 'Enfermedad pulmonar obstructiva crónica.');
