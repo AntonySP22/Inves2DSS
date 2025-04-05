@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     correo VARCHAR(100) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL,
     edad INT,
-    sexo ENUM('Masculino', 'Femenino', 'Otro') DEFAULT 'Otro',
-    rol ENUM('paciente', 'medico', 'admin') DEFAULT 'paciente',
+    sexo VARCHAR(20) DEFAULT 'Otro',
+    rol VARCHAR(20) DEFAULT 'paciente',
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS citas (
     paciente_id INT,
     medico_id INT,
     fecha_hora DATETIME,
-    estado ENUM('pendiente', 'confirmada', 'cancelada', 'completada') DEFAULT 'pendiente',
+    estado VARCHAR(20) DEFAULT 'pendiente',
     motivo TEXT,
     notas_medico TEXT,
     FOREIGN KEY (paciente_id) REFERENCES usuarios(id),
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS tratamientos (
     descripcion TEXT,
     fecha_inicio DATE,
     fecha_fin DATE,
-    estado ENUM('activo', 'completado', 'suspendido') DEFAULT 'activo',
+    estado VARCHAR(20) DEFAULT 'activo',
     FOREIGN KEY (paciente_id) REFERENCES usuarios(id),
     FOREIGN KEY (medico_id) REFERENCES perfiles_medicos(usuario_id)
 );
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS medicamentos (
 CREATE TABLE IF NOT EXISTS registros_salud (
     id INT AUTO_INCREMENT PRIMARY KEY,
     paciente_id INT,
-    tipo_registro ENUM('presion_arterial', 'glucosa', 'peso', 'otros'),
+    tipo_registro VARCHAR(50),
     valor VARCHAR(50),
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     notas TEXT,
@@ -92,10 +92,10 @@ CREATE TABLE IF NOT EXISTS registros_salud (
 CREATE TABLE IF NOT EXISTS notificaciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT,
-    tipo ENUM('cita', 'medicamento', 'general'),
+    tipo VARCHAR(20),
     mensaje TEXT,
     fecha_envio DATETIME,
-    estado ENUM('pendiente', 'enviado', 'leido'),
+    estado VARCHAR(20),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
