@@ -42,17 +42,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Redirigir según el rol
                 switch ($usuario['rol']) {
                     case 'admin':
-                        header("Location: usuarios/admin.php");
+                        header("Location: usuarios/admin/index.php");
                         break;
                     case 'medico':
-                        header("Location: citas/medico.php");
+                        header("Location: usuarios/medico/index.php");
                         break;
                     case 'paciente':
-                        header("Location: citas/paciente.php");
+                        header("Location: usuarios/paciente/index.php");
                         break;
-                    default:
-                        header("Location: index.php");
-                }
+                    }
                 exit();
             } else {
                 $mensaje = "Correo electrónico o contraseña incorrectos.";
