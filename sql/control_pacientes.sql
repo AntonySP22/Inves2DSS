@@ -109,25 +109,6 @@ CREATE TABLE IF NOT EXISTS logs_acceso (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
-CREATE TABLE `configuracion` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-        `nombre_clinica` varchar(100) NOT NULL DEFAULT 'Clínica Blanca Maravilla',
-          `horario_atencion` varchar(100) NOT NULL DEFAULT 'Lunes a Viernes, 8:00 AM - 6:00 PM',
-            `notificaciones_email` tinyint(1) NOT NULL DEFAULT 1,
-              `modo_mantenimiento` tinyint(1) NOT NULL DEFAULT 0,
-                `max_citas_dia` int(11) NOT NULL DEFAULT 20,
-                  `tema_color` varchar(20) NOT NULL DEFAULT 'principal',
-                    `logo` varchar(100) NOT NULL DEFAULT 'logo-default.png',
-                      PRIMARY KEY (`id`)
-                      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-                      -- Insertar configuración inicial
-                      INSERT INTO `configuracion` (`id`) VALUES (1);
-)
-
--- Insertar datos de prueba en las tablas creadas
--- --------------------------------------------------------
-
 -- Insertar usuarios (4 pacientes y 4 médicos)
 INSERT INTO usuarios (nombre, correo, contrasena, edad, sexo, rol) VALUES
 ('Ana Pérez', 'ana.perez@example.com', 'hash1', 30, 'Femenino', 'paciente'),
