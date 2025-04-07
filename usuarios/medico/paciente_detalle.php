@@ -326,12 +326,14 @@ $tratamientos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                     <div class="list-group-item">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
-                                                <h5 class="mb-2"><?= htmlspecialchars($enfermedad['nombre']) ?></h5>
-                                                <p class="mb-2"><?= htmlspecialchars($enfermedad['descripcion']) ?></p>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar-day me-1"></i>
-                                                    Diagnosticado el <?= date('d/m/Y', strtotime($enfermedad['fecha_diagnostico'])) ?>
-                                                </small>
+                                            <h5 class="mb-2"><?= !empty($enfermedad['nombre']) ? htmlspecialchars($enfermedad['nombre']) : 'Nombre no disponible' ?></h5>
+                                            <p class="mb-2"><?= !empty($enfermedad['descripcion']) ? htmlspecialchars($enfermedad['descripcion']) : 'Descripción no disponible' ?></p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-day me-1"></i>
+                                                Diagnosticado el <?= !empty($enfermedad['fecha_diagnostico']) ? date('d/m/Y', strtotime($enfermedad['fecha_diagnostico'])) : 'Fecha no disponible' ?>
+                                            </small>
+
+                                                    
                                             </div>
                                             <span class="badge bg-primary">Crónica</span>
                                         </div>
@@ -352,42 +354,52 @@ $tratamientos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             
             <!-- Citas y tratamientos -->
             <div class="row">
-                <!-- Citas recientes -->
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <i class="fas fa-calendar-day me-2"></i>Citas Recientes
+              <!-- Citas recientes -->
+<div class="col-md-6 mb-4">
+    <div class="card h-100">
+        <div class="card-header">
+            <i class="fas fa-calendar-day me-2"></i>Citas Recientes
+        </div>
+        <div class="card-body">
+            <?php if (!empty($citas)): ?>
+                <div class="list-group">
+                    <?php foreach ($citas as $cita): ?>
+                    <a href="cita.php?id=<?= $cita['id'] ?>" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="mb-2"><?= !empty($cita['fecha_hora']) ? date('d/m/Y H:i', strtotime($cita['fecha_hora'])) : 'Fecha no disponible' ?></h5>
+                                <p class="mb-2"><i class="fas fa-comment-medical me-1"></i> <?= !empty($cita['motivo']) ? htmlspecialchars($cita['motivo']) : 'Motivo no disponible' ?></p>
+                            </div>
+                            <span class="badge <?= $cita['estado'] === 'pendiente' ? 'bg-warning' : 'bg-success' ?>">
+                                <?= ucfirst($cita['estado']) ?>
+                            </span>
                         </div>
-                        <div class="card-body">
-                            <?php if (!empty($citas)): ?>
-                                <div class="list-group">
-                                    <?php foreach ($citas as $cita): ?>
-                                    <a href="cita.php?id=<?= $cita['id'] ?>" class="list-group-item list-group-item-action">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h5 class="mb-2"><?= date('d/m/Y H:i', strtotime($cita['fecha_hora'])) ?></h5>
-                                                <p class="mb-2"><i class="fas fa-comment-medical me-1"></i> <?= htmlspecialchars($cita['motivo']) ?></p>
-                                            </div>
-                                            <span class="badge <?= $cita['estado'] === 'pendiente' ? 'bg-warning' : 'bg-success' ?>">
-                                                <?= ucfirst($cita['estado']) ?>
-                                            </span>
-                                        </div>
-                                    </a>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php else: ?>
-                                <div class="empty-state">
-                                    <i class="fas fa-calendar-times"></i>
-                                    <h5>No hay citas registradas</h5>
-                                    <p>No se han realizado citas con este paciente.</p>
-                                    <a href="solicitar_cita.php?paciente_id=<?= $paciente_id ?>" class="btn btn-primary">
-                                        <i class="fas fa-calendar-plus me-1"></i> Agendar cita
-                                    </a>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    </a>
+                    <?php endforeach; ?>
                 </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h5>No hay citas registradas</h5>
+                    <p>No se han realizado citas con este paciente.</p>
+                    <a href="solicitar_cita.php?paciente_id=<?= $paciente_id ?>" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus me-1"></i> Agendar cita
+                    </a>
+                </div>
+            <?php endif; ?>
+            
+            <!-- Botón para crear nueva cita, con mismo estilo que "Crear tratamiento" -->
+            <div class="empty-state mt-3">
+                <i class="fas fa-calendar-plus"></i>
+                <h5>Crear nueva cita</h5>
+                <p>Agrega una nueva cita para este paciente.</p>
+                <a href="citas.php?paciente_id=<?= $paciente_id ?>" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus me-1"></i> Nueva cita
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
                 
                 <!-- Tratamientos -->
                 <div class="col-md-6 mb-4">
@@ -406,8 +418,9 @@ $tratamientos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                                 <p class="mb-2"><?= htmlspecialchars(substr($tratamiento['descripcion'], 0, 100)) ?>...</p>
                                                 <small class="text-muted">
                                                     <i class="fas fa-calendar-check me-1"></i>
-                                                    Desde <?= date('d/m/Y', strtotime($tratamiento['fecha_inicio'])) ?>
+                                                    Desde <?= !empty($tratamiento['fecha_inicio']) ? date('d/m/Y', strtotime($tratamiento['fecha_inicio'])) : 'Fecha no disponible' ?>
                                                 </small>
+
                                             </div>
                                             <span class="badge <?= $tratamiento['estado'] === 'activo' ? 'bg-success' : 'bg-secondary' ?>">
                                                 <?= ucfirst($tratamiento['estado']) ?>

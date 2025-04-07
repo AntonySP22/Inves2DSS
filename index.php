@@ -23,6 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verificar credenciales en la base de datos
         $sql = "SELECT id, nombre, correo, contrasena, rol FROM usuarios WHERE correo = ?";
         $stmt = $conexion->prepare($sql);
+        if ($stmt === false) {
+            die('Error en la preparación de la consulta: ' . $conexion->error);
+        }
         $stmt->bind_param("s", $correo);
         $stmt->execute();
         $resultado = $stmt->get_result();
@@ -30,41 +33,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($resultado->num_rows === 1) {
             $usuario = $resultado->fetch_assoc();
             
-            // Verificar la contraseña
-            if (password_verify($contrasena, $usuario['contrasena'])) {
-                // Iniciar sesión
-                session_start();
-                $_SESSION['id'] = $usuario['id'];
-                $_SESSION['nombre'] = $usuario['nombre'];
-                $_SESSION['correo'] = $usuario['correo'];
-                $_SESSION['rol'] = $usuario['rol'];
-                
-                // Redirigir según el rol
-                switch ($usuario['rol']) {
-                    case 'admin':
-                        header("Location: usuarios/admin/index.php");
-                        break;
-                    case 'medico':
-                        header("Location: usuarios/medico/index.php");
-                        break;
-                    case 'paciente':
-                        header("Location: usuarios/paciente/index.php");
-                        break;
-                    }
-                exit();
-            } else {
-                $mensaje = "Correo electrónico o contraseña incorrectos.";
-                $tipo_mensaje = "danger";
-            }
-        } else {
-            $mensaje = "Correo electrónico o contraseña incorrectos.";
-            $tipo_mensaje = "danger";
-        }
+            /// Verificar la contraseña usando password_verify()
+if (password_verify($contrasena, $usuario['contrasena'])) {
+    // Iniciar sesión
+    session_start();
+    $_SESSION['id'] = $usuario['id'];
+    $_SESSION['nombre'] = $usuario['nombre'];
+    $_SESSION['correo'] = $usuario['correo'];
+    $_SESSION['rol'] = $usuario['rol'];
+    
+    // Redirigir según el rol
+    switch ($usuario['rol']) {
+        case 'admin':
+            header("Location: usuarios/admin/index.php");
+            break;
+        case 'medico':
+            header("Location: usuarios/medico/index.php");
+            break;
+        case 'paciente':
+            header("Location: usuarios/paciente/index.php");
+            break;
+    }
+    exit();
+} else {
+    $mensaje = "Correo electrónico o contraseña incorrectos.";
+    $tipo_mensaje = "danger";
+}
+
+        } 
         
         $stmt->close();
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -90,10 +92,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php endif; ?>
             
-            <div id="loginError" class="login-error">
-                <i class="bi bi-exclamation-circle"></i> Correo o contraseña incorrectos. Por favor, inténtelo de nuevo.
-            </div>
-            
             <form id="loginForm" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" novalidate>
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo Electrónico</label>
@@ -115,6 +113,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="text-center mt-3">
                     <small>¿No tiene una cuenta? <a href="registro.php" class="text-decoration-none" style="color: var(--primary-color);">Registrarse</a></small>
                 </div>
+                  <!-- Enlace para ir al formulario de "Olvidé mi contraseña" -->
+                <div class="text-center mt-3">
+                    <small>¿Olvidaste tu contraseña? <a href="olvide_contrasena.php" class="text-decoration-none">Recupérala aquí</a></small>
+                </div>
             </form>
         </div>
     </div>
@@ -126,3 +128,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="js/login.js"></script>
 </body>
 </html>
+

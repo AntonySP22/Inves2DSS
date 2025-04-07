@@ -5,7 +5,34 @@ require_once __DIR__ . '/../../db/db.php';
 
 $medico_id = $_SESSION['id'];
 
-// Obtener pacientes del médico
+// Número de pacientes por página
+$pacientes_por_pagina = 14;
+
+// Obtener el número total de pacientes
+$stmt = $conexion->prepare("SELECT COUNT(DISTINCT u.id) AS total_pacientes
+    FROM usuarios u
+    JOIN citas c ON u.id = c.paciente_id
+    WHERE c.medico_id = ?
+    UNION
+    SELECT COUNT(DISTINCT u.id) AS total_pacientes
+    FROM usuarios u
+    JOIN tratamientos t ON u.id = t.paciente_id
+    WHERE t.medico_id = ?");
+$stmt->bind_param("ii", $medico_id, $medico_id);
+$stmt->execute();
+$total_pacientes = $stmt->get_result()->fetch_assoc()['total_pacientes'];
+
+// Calcular el número total de páginas
+$total_paginas = ceil($total_pacientes / $pacientes_por_pagina);
+
+// Obtener el número de página actual
+$pagina_actual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$pagina_actual = max(1, min($pagina_actual, $total_paginas));
+
+// Calcular el desplazamiento
+$desplazamiento = ($pagina_actual - 1) * $pacientes_por_pagina;
+
+// Obtener pacientes del médico con paginación
 $stmt = $conexion->prepare("
     SELECT DISTINCT u.id, u.nombre, u.edad, u.sexo, u.correo
     FROM usuarios u
@@ -16,8 +43,9 @@ $stmt = $conexion->prepare("
     FROM usuarios u
     JOIN tratamientos t ON u.id = t.paciente_id
     WHERE t.medico_id = ?
+    LIMIT ?, ?
 ");
-$stmt->bind_param("ii", $medico_id, $medico_id);
+$stmt->bind_param("iiii", $medico_id, $medico_id, $desplazamiento, $pacientes_por_pagina);
 $stmt->execute();
 $pacientes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
@@ -63,11 +91,6 @@ unset($paciente); // Romper la referencia
 <html lang="es">
 <head>
 <title>Mis Pacientes | Panel Médico</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Mis Pacientes | Panel Médico</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -223,8 +246,6 @@ unset($paciente); // Romper la referencia
 </head>
 <body>
     <div class="d-flex">
-
-       <!-- Contenido principal -->
        <div class="main-content">
             <div class="welcome-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -238,7 +259,6 @@ unset($paciente); // Romper la referencia
                 </div>
             </div>
             
-            <!-- Listado de pacientes -->
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-user-injured me-2"></i>Pacientes Asignados
@@ -249,14 +269,14 @@ unset($paciente); // Romper la referencia
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>  Nombre  </th>
-                                        <th>  Edad  </th>
-                                        <th>  Sexo  </th>
-                                        <th>  Correo  </th>
-                                        <th>  Enfermedades  </th>
-                                        <th> Citas Pendientes </th>
-                                        <th> Tratamientos Activos </th>
-                                        <th>  Acciones  </th>
+                                        <th>Nombre</th>
+                                        <th>Edad</th>
+                                        <th>Sexo</th>
+                                        <th>Correo</th>
+                                        <th>Enfermedades</th>
+                                        <th>Citas Pendientes</th>
+                                        <th>Tratamientos Activos</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -279,6 +299,22 @@ unset($paciente); // Romper la referencia
                                 </tbody>
                             </table>
                         </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item <?= ($pagina_actual == 1) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?pagina=1">Primera</a>
+                                </li>
+                                <li class="page-item <?= ($pagina_actual == 1) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?pagina=<?= $pagina_actual - 1 ?>">Anterior</a>
+                                </li>
+                                <li class="page-item <?= ($pagina_actual == $total_paginas) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?pagina=<?= $pagina_actual + 1 ?>">Siguiente</a>
+                                </li>
+                                <li class="page-item <?= ($pagina_actual == $total_paginas) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?pagina=<?= $total_paginas ?>">Última</a>
+                                </li>
+                            </ul>
+                        </nav>
                     <?php else: ?>
                         <div class="empty-state">
                             <i class="fas fa-user-slash"></i>
@@ -290,10 +326,8 @@ unset($paciente); // Romper la referencia
             </div>
         </div>
     </div>
-<!-- Bootstrap Bundle with Popper -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    
 </body>
 </html>

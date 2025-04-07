@@ -1,8 +1,17 @@
 <?php
 session_start();
-
+require_once '../../db/db.php'; 
 // Guardamos el valor de redirección antes de destruir la sesión
 $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '../../index.php';
+
+if (isset($_SESSION['id'])) {
+    $usuario_id = $_SESSION['id'];
+    $query = "DELETE FROM google_calendar_auth WHERE usuario_id = ?";
+    $stmt = $conexion->prepare($query);
+    $stmt->bind_param("i", $usuario_id);
+    $stmt->execute();
+}
+
 
 // Destruir todas las variables de sesión
 $_SESSION = array();

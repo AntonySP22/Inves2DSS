@@ -24,6 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ];
     $rol = $rol_map[$_POST['rol']]; // Rol seleccionado por el usuario
     
+    // Si el rol es médico, tomar la especialidad y la licencia médica
+    $especialidad = ($rol === 'medico') ? $_POST['especialidad'] : null;
+    $licencia_medica = ($rol === 'medico') ? $_POST['licencia_medica'] : null;
+
     // Validar los datos ingresados por el usuario
     $errores = [];
     if (empty($nombre)) {
@@ -48,6 +52,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssiss", $nombre, $correo, $contrasena_hash, $edad, $sexo, $rol); // Vincular los datos
         
         if ($stmt->execute()) {
+            $usuario_id = $conexion->insert_id; // Obtener el ID del usuario recién insertado
+            
+            // Si el rol es médico, insertar en la tabla `perfiles_medicos`
+            if ($rol === 'medico') {
+                if (!empty($especialidad) && !empty($licencia_medica)) {
+                    $sql_perfil = "INSERT INTO perfiles_medicos (usuario_id, especialidad, licencia_medica) 
+                                   VALUES (?, ?, ?)";
+                    $stmt_perfil = $conexion->prepare($sql_perfil);
+                    $stmt_perfil->bind_param("iss", $usuario_id, $especialidad, $licencia_medica); // Insertar el perfil médico
+                    $stmt_perfil->execute();
+                    $stmt_perfil->close();
+                } else {
+                    $mensaje = "Debe proporcionar una especialidad y licencia médica para registrarse como médico";
+                    $tipo_mensaje = "danger";
+                    $stmt->close(); // Cerrar la consulta
+                    exit;
+                }
+            }
+
+            // Mensaje de éxito
             $mensaje = "Usuario registrado correctamente"; // Mensaje de éxito
             $tipo_mensaje = "success";
         } else {
@@ -65,13 +89,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Registro</title>
-    <!-- Estilos y librerías necesarias -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="css/registro.css" rel="stylesheet">
@@ -158,7 +182,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- Campos para especialidad y licencia médica (solo si el rol es doctor) -->
+                <div class="mb-3" id="especialidadDiv" style="display:none;">
+                    <label for="especialidad" class="form-label">Especialidad Médica</label>
+                    <select class="form-select" name="especialidad" id="especialidad" required>
+                        <option value="Medicina General">Medicina General</option>
+                        <option value="Cardiología">Cardiología</option>
+                        <option value="Neurología">Neurología</option>
+                        <!-- Agrega más opciones según lo necesario -->
+                    </select>
+                </div>
+
+                <div class="mb-3" id="licenciaDiv" style="display:none;">
+                    <label for="licencia_medica" class="form-label">Licencia Médica</label>
+                    <input type="text" class="form-control" id="licencia_medica" name="licencia_medica" placeholder="Ingrese su número de licencia médica" required>
+                </div>
+
                 <!-- Botón para enviar el formulario -->
                 <button type="submit" class="btn btn-register">Registrarse</button>
                 
@@ -166,12 +206,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="text-center mt-3">
                     <small>¿Ya tiene una cuenta? <a href="index.php" class="text-decoration-none">Iniciar sesión</a></small>
                 </div>
+                
             </form>
         </div>
     </div>
 
-    <!-- Scripts necesarios -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/registro.js"></script>
+    <script>
+        // Mostrar el select de especialidad y el campo de licencia solo si el rol es 'doctor'
+        document.querySelectorAll('input[name="rol"]').forEach(function(roleInput) {
+            roleInput.addEventListener('change', function() {
+                var especialidadDiv = document.getElementById('especialidadDiv');
+                var licenciaDiv = document.getElementById('licenciaDiv');
+                if (this.value === 'doctor') {
+                    especialidadDiv.style.display = 'block';
+                    licenciaDiv.style.display = 'block';
+                } else {
+                    especialidadDiv.style.display = 'none';
+                    licenciaDiv.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+
