@@ -1,0 +1,118 @@
+:root {
+    --primary-color: #6c63ff;
+    --secondary-color: #f5f5f5;
+    --text-color: #333;
+    --light-color: #fff;
+    --border-radius: 10px;
+}
+
+body {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 40px;
+}
+
+.form-container {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-title {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.form-control {
+    border-radius: var(--border-radius);
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
+}
+
+.btn-register {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: var(--border-radius);
+    color: var(--light-color);
+    font-weight: 600;
+    padding: 12px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.btn-register:hover {
+    background-color: #5549ff;
+    transform: translateY(-2px);
+}
+
+.role-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.role-option {
+    flex: 1;
+    text-align: center;
+}
+
+.role-option input {
+    margin-right: 5px;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Estilo para el contenedor del input */
+.position-relative {
+    position: relative;
+}
+
+/* Estilo para el icono dentro del input */
+.subtle-icon {
+    font-size: 1rem; /* Tamaño del icono */
+    color: #6c757d; /* Color gris sutil */
+    position: absolute;
+    top: 50%;
+    right: 10px; /* Espaciado desde el borde derecho */
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.subtle-icon:hover {
+    color: #495057; /* Color más oscuro al pasar el cursor */
+}
+
+/* Ajuste para el input de contraseña */
+.password-input {
+    padding-right: 35px; /* Espacio para el icono */
+}
+
+.toggle-password:hover .subtle-icon {
+    color: #495057; /* Color ligeramente más oscuro al pasar el cursor */
+}
