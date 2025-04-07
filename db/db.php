@@ -16,3 +16,6 @@ if ($conexion->connect_error) {
 // Establecer el conjunto de caracteres
 $conexion->set_charset("utf8");
 ?>
+
+
+
